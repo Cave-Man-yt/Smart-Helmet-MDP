@@ -22,7 +22,7 @@ from collections import deque
 
 # Fall Detection Thresholds
 FALL_VELOCITY_THRESHOLD = 5.0
-MIN_CONSECUTIVE_FRAMES = 3
+MIN_CONSECUTIVE_FRAMES = 2
 
 # IMPROVED: Lower confidence for better detection
 DETECTION_CONFIDENCE = 0.25  # Changed from 0.5 to 0.25
@@ -48,8 +48,8 @@ FRAME_WIDTH = 640
 FRAME_HEIGHT = 480
 TARGET_FPS = 30
 
-# Debug mode - shows more information
-DEBUG_MODE = True
+# Debug mode - set True for verbose logging (floods terminal)
+DEBUG_MODE = False
 
 # ============================================================================
 # AUDIO SYSTEM
@@ -57,11 +57,19 @@ DEBUG_MODE = True
 
 class AudioAlertSystem:
     def __init__(self):
-        pygame.mixer.init(frequency=22050, size=-16, channels=1, buffer=512)
+        self.audio_available = False
         self.alert_active = False
-        self.generate_beep_sound()
+        try:
+            pygame.mixer.init(frequency=22050, size=-16, channels=1, buffer=512)
+            self.audio_available = True
+            self.generate_beep_sound()
+        except (NotImplementedError, Exception) as e:
+            print(f"⚠️  Audio mixer not available: {e}")
+            print("🔊 System will continue without audio alerts")
     
     def generate_beep_sound(self):
+        if not self.audio_available:
+            return
         sample_rate = 22050
         duration = 0.2
         frequency = 800
@@ -74,7 +82,7 @@ class AudioAlertSystem:
         self.beep_sound = pygame.sndarray.make_sound(stereo_buf)
     
     def play_alert(self):
-        if not self.alert_active:
+        if self.audio_available and not self.alert_active:
             self.beep_sound.play()
             self.alert_active = True
     
@@ -114,7 +122,7 @@ class FallDetector:
                 distance = np.sqrt((center_x - prev_center_x)**2 + 
                                  (center_y - prev_center_y)**2)
                 
-                if distance < 100 and class_name == prev_class:
+                if distance < 300 and class_name == prev_class:
                     velocity = self.calculate_velocity(center_y, prev_center_y)
                     
                     if DEBUG_MODE:
@@ -168,7 +176,7 @@ class VisualAlertRenderer:
         cv2.addWeighted(overlay, 0.3, frame, 0.7, 0, frame)
         
         text = "DANGER!"
-        font = cv2.FONT_HERSHEY_BOLD
+        font = cv2.FONT_HERSHEY_SIMPLEX
         font_scale = 3
         thickness = 8
         
@@ -382,7 +390,11 @@ class SmartHelmetPhase1:
         finally:
             self.cap.release()
             cv2.destroyAllWindows()
-            pygame.mixer.quit()
+            try:
+                if pygame.mixer.get_init():
+                    pygame.mixer.quit()
+            except (NotImplementedError, Exception):
+                pass
             print("✅ Cleanup complete")
 
 # ============================================================================

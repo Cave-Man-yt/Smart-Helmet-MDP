@@ -27,3 +27,6 @@ runs/
 weights/
 *.pt
 *.pth
+
+# Agent context (local only)
+.agent/
