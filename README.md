@@ -1,8 +1,6 @@
-# 🏗️ AI-Augmented Smart Safety Helmet
+# Smart Safety Helmet
 
 A **real-time falling object detection system** for construction worker safety. Uses an ESP32-CAM mounted on a helmet to detect objects falling toward the wearer and trigger immediate audio/visual alerts.
-
-> **No AI model needed.** Uses motion-based detection that works with **any** falling object — bricks, tools, debris, phones, anything.
 
 ---
 
