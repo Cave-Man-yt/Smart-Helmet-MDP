@@ -1,22 +1,3 @@
-# AI-Augmented Smart Safety Helmet - Phase 1 Requirements
-# Install with: pip install -r requirements.txt
-
-# Deep Learning and Computer Vision
-torch>=2.0.0
-torchvision>=0.15.0
-opencv-python>=4.8.0
-
-# YOLOv5 dependencies
-ultralytics
-Pillow>=9.0.0
-
-# Audio
-pygame>=2.5.0
-
-# Numerical computing
-numpy>=1.24.0
-
-# Utilities
-tqdm>=4.65.0
-matplotlib>=3.7.0
-seaborn>=0.12.0
+opencv-python
+numpy
+pygame
